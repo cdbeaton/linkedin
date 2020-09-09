@@ -3,6 +3,7 @@
 namespace Cdbeaton\Linkedin;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class LinkedIn
 {
