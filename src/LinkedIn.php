@@ -34,7 +34,7 @@ class LinkedIn
                 return true;
             } else {
                 // Log error message and return it
-                $error = $response->query('error_description');
+                $error = $response->getBody();
                 Log::error($error);
                 return $error;
             }
