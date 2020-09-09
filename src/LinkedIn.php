@@ -25,7 +25,7 @@ class LinkedIn
                 ]);
             }
 
-            $response = Http::withToken($authorized)->asForm()->post($post_share_url, [
+            $response = Http::withToken($authorized)->post($post_share_url, [
                 'content' => $content,
                 'owner' => $owner,
                 'text' => array(['text' => $text])
