@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class LinkedInController extends Controller
 {
-    public function authorization($scope){
+    public function authorization(Request $request){
         // Check if we already have a valid access token
         $authorized = Cache::get('access_token');
 
@@ -24,7 +24,7 @@ class LinkedInController extends Controller
                 'client_id' => env('LINKEDIN_CLIENT_ID'),
                 'redirect_uri' => env('LINKEDIN_REDIRECT_URI'),
                 'state' => env('LINKEDIN_STATE'),
-                'scope' => $scope
+                'scope' => $request->get('scope')
             );
 
             $query = http_build_query($query_parts);
