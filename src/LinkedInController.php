@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class LinkedInController extends Controller
@@ -61,8 +62,10 @@ class LinkedInController extends Controller
                 return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
             }
         } else {
-            // TODO: Better error catching
-            echo $request->query('error_description');
+            // Log error message and then redirect
+            $error = $request->query('error_description');
+            Log::error($error);
+            return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
         }
     }
 }
