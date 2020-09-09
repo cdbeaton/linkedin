@@ -1,0 +1,13 @@
+{
+    "name": "cdbeaton/linkedin",
+    "description": "A simple Laravel package for making LinkedIn API v2 calls.",
+    "authors": [
+        {
+            "name": "Connor Beaton",
+            "email": "connor.d.beaton@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
