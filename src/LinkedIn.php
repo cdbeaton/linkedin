@@ -14,25 +14,25 @@ class LinkedIn
         return false;
     }
 
-    static function postShare($content, $owner, $text=null)
+    static function postShare($url, $owner, $text=null)
     {
         if(LinkedIn::isAuthorized()){
             $post_share_url = 'https://api.linkedin.com/v2/shares';
 
-            if(!is_array($content)){
-                // If $content is not an array, assume it is a URL
-                $content = array([
-                    'contentEntities' => array([
-                        'entityLocation' => $content
-                    ])
-                ]);
+            $entityLocation = $content;
+            $contentEntities['entityLocation'] = $entityLocation;
+            $content['$contentEntities'] = [$contentEntities];
+            $distribution['linkedInDistributionTarget'] = (object) null;
+            $data['content'] = $content;
+            $data['owner'] = $owner;
+            $data['$distribution'] = $distribution;
+
+            if($text) {
+                $t['text'] = $text;
+                $data['text'] = $t;
             }
 
-            $response = Http::withToken($authorized)->post($post_share_url, [
-                'content' => $content,
-                'owner' => $owner,
-                'text' => array(['text' => $text])
-            ]);
+            $response = Http::withToken($authorized)->post($post_share_url, $data);
 
             if($response->successful()) {
                 return true;
@@ -40,6 +40,7 @@ class LinkedIn
                 // Log error message and return it
                 $error = $response->getBody();
                 Log::error($error);
+                Log::info($data);
                 return $error;
             }
         } else {
