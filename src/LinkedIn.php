@@ -46,7 +46,7 @@ class LinkedIn
                 $error = $response->getBody();
                 Log::error($error);
                 Log::info($data);
-                return $error;
+                return false;
             }
         } else {
             // TODO: Prompt for authorization
