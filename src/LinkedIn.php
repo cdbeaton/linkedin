@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\Log;
 
 class LinkedIn
 {
+    static function isAuthorized()
+    {
+        if(Cache::get('access_token')) { return true; }
+        return false;
+    }
+
     static function postShare($content, $owner, $text=null)
     {
-        // Check if we already have a valid access token
-        $authorized = Cache::get('access_token');
-
-        if($authorized){
+        if(LinkedIn::isAuthorized()){
             $post_share_url = 'https://api.linkedin.com/v2/shares';
 
             if(!is_array($content)){
