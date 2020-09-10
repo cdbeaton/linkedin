@@ -30,7 +30,7 @@ class LinkedIn
             $distribution['linkedInDistributionTarget'] = (object) null;
             $data['content'] = $content;
             $data['owner'] = $owner;
-            $data['$distribution'] = $distribution;
+            $data['distribution'] = $distribution;
 
             if($text) {
                 $t['text'] = $text;
