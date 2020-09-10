@@ -37,6 +37,7 @@ class LinkedIn
                 $data['text'] = $t;
             }
 
+            Log::info($data);
             $response = Http::withToken(LinkedIn::getToken())->post($post_share_url, $data);
 
             if($response->successful()) {
@@ -45,7 +46,6 @@ class LinkedIn
                 // Log error message and return it
                 $error = $response->getBody();
                 Log::error($error);
-                Log::info($data);
                 return false;
             }
         } else {
