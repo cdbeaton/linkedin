@@ -24,7 +24,7 @@ class LinkedIn
         if(LinkedIn::isAuthorized()){
             $post_share_url = 'https://api.linkedin.com/v2/shares';
 
-            $entityLocation = $content;
+            $entityLocation = $url;
             $contentEntities['entityLocation'] = $entityLocation;
             $content['$contentEntities'] = [$contentEntities];
             $distribution['linkedInDistributionTarget'] = (object) null;
