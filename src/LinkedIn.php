@@ -19,10 +19,16 @@ class LinkedIn
         return Cache::get('access_token');
     }
 
-    static function postShare($url, $owner, $text=null)
+    static function postShare($url, $owner, $text=null, $image=null)
     {
         if(LinkedIn::isAuthorized()){
             $post_share_url = 'https://api.linkedin.com/v2/shares';
+
+            if($image) {
+                $resolvedUrl = $image;
+                $thumbnails['resolvedUrl'] = $resolvedUrl;
+                $contentEntities['thumbnails'] = [$thumbnails];
+            }
 
             $entityLocation = $url;
             $contentEntities['entityLocation'] = $entityLocation;
