@@ -10,8 +10,13 @@ class LinkedIn
 {
     static function isAuthorized()
     {
-        if(Cache::get('access_token')) { return true; }
+        if(LinkedIn::getToken()) { return true; }
         return false;
+    }
+
+    static function getToken()
+    {
+        return Cache::get('access_token');
     }
 
     static function postShare($url, $owner, $text=null)
@@ -32,7 +37,7 @@ class LinkedIn
                 $data['text'] = $t;
             }
 
-            $response = Http::withToken($authorized)->post($post_share_url, $data);
+            $response = Http::withToken(LinkedIn::getToken())->post($post_share_url, $data);
 
             if($response->successful()) {
                 return true;
