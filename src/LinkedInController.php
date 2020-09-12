@@ -35,6 +35,11 @@ class LinkedInController extends Controller
         }
     }
 
+    public function deauthorization(){
+        Cache::forget('access_token');
+        return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
+    }
+
     public function callback(Request $request){
         $error = $request->query('error', false);
 
