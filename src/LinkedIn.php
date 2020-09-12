@@ -19,43 +19,48 @@ class LinkedIn
         return Cache::get('access_token');
     }
 
-    static function postShare($url, $owner, $text=null, $image=null)
+    static function postShare($owner, $text=null, $url=null, $image=null)
     {
         if(LinkedIn::isAuthorized()){
             $post_share_url = 'https://api.linkedin.com/v2/shares';
-
-            if($image) {
-                $resolvedUrl = $image;
-                $thumbnails['resolvedUrl'] = $resolvedUrl;
-                $contentEntities['thumbnails'] = [$thumbnails];
-            }
-
-            $entityLocation = $url;
-            $contentEntities['entityLocation'] = $entityLocation;
-            $content['$contentEntities'] = [$contentEntities];
-            $distribution['linkedInDistributionTarget'] = (object) null;
-            $data['content'] = $content;
-            $data['owner'] = $owner;
-            $data['distribution'] = $distribution;
 
             if($text) {
                 $t['text'] = $text;
                 $data['text'] = $t;
             }
 
-            Log::info($data);
+            if($url) {
+                $entityLocation = $url;
+                $contentEntities['entityLocation'] = $entityLocation;
+
+                if($image) {
+                    $resolvedUrl = $image;
+                    $thumbnails['resolvedUrl'] = $resolvedUrl;
+                    $contentEntities['thumbnails'] = [$thumbnails];
+                }
+
+                $content['contentEntities'] = [$contentEntities];
+                $data['content'] = $content;
+            }
+
+            $data['owner'] = $owner;
+            $distribution['linkedInDistributionTarget'] = (object) null;
+            $data['distribution'] = $distribution;
+
             $response = Http::withToken(LinkedIn::getToken())->post($post_share_url, $data);
 
             if($response->successful()) {
                 return true;
             } else {
-                // Log error message and return it
+                // Log error message and return false
                 $error = $response->getBody();
                 Log::error($error);
+                Log::info($data);
                 return false;
             }
         } else {
-            // TODO: Prompt for authorization
+            // TODO: Better error catching
+            Log::error('LinkedIn: Cannot post shares without being authorized.');
         }
     }
 }
