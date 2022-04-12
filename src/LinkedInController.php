@@ -21,9 +21,9 @@ class LinkedInController extends Controller
 
             $query_parts = array(
                 'response_type' => 'code',
-                'client_id' => env('LINKEDIN_CLIENT_ID'),
-                'redirect_uri' => env('LINKEDIN_REDIRECT_URI'),
-                'state' => env('LINKEDIN_STATE'),
+                'client_id' => config('linkedin.client_id'),
+                'redirect_uri' => config('linkedin.redirect_uri'),
+                'state' => config('linkedin.state'),
                 'scope' => $request->get('scope')
             );
 
@@ -31,13 +31,13 @@ class LinkedInController extends Controller
             return redirect($authorization_url.'?'.$query);
         } else {
             // We can skip the authentication process
-            return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
+            return redirect(config('linkedin.post_callback_uri'));
         }
     }
 
     public function deauthorization(){
         Cache::forget('access_token');
-        return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
+        return redirect(config('linkedin.post_callback_uri'));
     }
 
     public function callback(Request $request){
@@ -53,9 +53,9 @@ class LinkedInController extends Controller
             $response = Http::asForm()->post($access_token_url, [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri' => env('LINKEDIN_REDIRECT_URI'),
-                'client_id' => env('LINKEDIN_CLIENT_ID'),
-                'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+                'redirect_uri' => config('linkedin.redirect_uri'),
+                'client_id' => config('linkedin.client_id'),
+                'client_secret' => config('linkedin.client_secret'),
             ]);
 
             if($response->successful()) {
@@ -64,13 +64,13 @@ class LinkedInController extends Controller
 
                 // Cache the access_token for expires_in seconds and then redirect
                 Cache::put('access_token', $access_token, $expires_in);
-                return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
+                return redirect(config('linkedin.post_callback_uri'));
             }
         } else {
             // Log error message and then redirect
             $error = $request->query('error_description');
             Log::error($error);
-            return redirect(env('LINKEDIN_POST_CALLBACK_URI'));
+            return redirect(config('linkedin.post_callback_uri'));
         }
     }
 }
