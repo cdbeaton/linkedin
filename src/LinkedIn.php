@@ -38,7 +38,7 @@ class LinkedIn
                 $initialise_image_url = 'https://api.linkedin.com/rest/images?action=initializeUpload';
                 $initialise_image_response = Http::withToken(LinkedIn::getToken())->post(
                     $initialise_image_url,
-                    ['initializeUploadRequest' => ['owner' => $owner]]
+                    ['initializeUploadRequest' => ['owner' => $author]]
                 );
                 $initialise_image_data = json_decode($response->getBody());
 
