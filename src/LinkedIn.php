@@ -40,7 +40,7 @@ class LinkedIn
                     $initialise_image_url,
                     ['initializeUploadRequest' => ['owner' => $author]]
                 );
-                $initialise_image_data = json_decode($response->getBody());
+                $initialise_image_data = json_decode($initialise_image_response->getBody());
 
                 if (property_exists($initialise_image_data, 'value')) {
                     $image_upload_url = $initialise_image_data->uploadUrl;
