@@ -36,10 +36,12 @@ class LinkedIn
             // Upload any thumbnail to LinkedIn using the Images API
             if ($image) {
                 $initialise_image_url = 'https://api.linkedin.com/rest/images?action=initializeUpload';
-                $initialise_image_response = Http::withToken(LinkedIn::getToken())->post(
-                    $initialise_image_url,
-                    ['initializeUploadRequest' => ['owner' => $author]]
-                );
+                $initialise_image_response = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
+                    ->withToken(LinkedIn::getToken())
+                    ->post(
+                        $initialise_image_url,
+                        ['initializeUploadRequest' => ['owner' => $author]]
+                    );
                 $initialise_image_data = json_decode($initialise_image_response->getBody());
 
                 if (property_exists($initialise_image_data, 'value')) {
@@ -48,7 +50,8 @@ class LinkedIn
                     $image_get = Http::get($image);
                     if ($image_get->successful()) {
                         $image_body = (string) $image_get->body();
-                        $image_upload = Http::withBody($image_body, 'application/zip')
+                        $image_upload = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
+                            ->withBody($image_body)
                             ->withToken(LinkedIn::getToken())
                             ->put($image_upload_url);
 
