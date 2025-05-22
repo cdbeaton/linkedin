@@ -19,37 +19,66 @@ class LinkedIn
         return Cache::get('access_token');
     }
 
-    static function postShare($owner, $text=null, $url=null, $image=null, $title=null)
+    static function postShare($author, $commentary=null, $url=null, $image=null, $title=null)
     {
         if(LinkedIn::isAuthorized()){
-            $post_share_url = 'https://api.linkedin.com/v2/shares';
+            $post_share_url = 'https://api.linkedin.com/rest/posts';
 
-            if($text) {
-                $t['text'] = $text;
-                $data['text'] = $t;
-            }
+            $data['author'] = $author;
+            if($commentary) { $data['commentary'] = $commentary; }
+            $data['visibility'] = 'PUBLIC';
+            $data['distribution'] = [
+                'feedDistribution' => 'MAIN_FEED',
+                'targetEntities' => [],
+                'thirdPartyDistributionChannels' => []
+            ];
 
-            if($url) {
-                $entityLocation = $url;
-                $contentEntities['entityLocation'] = $entityLocation;
+            // Upload any thumbnail to LinkedIn using the Images API
+            if ($image) {
+                $initialise_image_url = 'https://api.linkedin.com/rest/images?action=initializeUpload';
+                $initialise_image_response = Http::withToken(LinkedIn::getToken())->post(
+                    $initialise_image_url,
+                    ['initializeUploadRequest' => ['owner' => $owner]]
+                );
+                $initialise_image_data = json_decode($response->getBody());
 
-                if($image) {
-                    $resolvedUrl = $image;
-                    $thumbnails['resolvedUrl'] = $resolvedUrl;
-                    $contentEntities['thumbnails'] = [$thumbnails];
+                if (property_exists($initialise_image_data, 'value')) {
+                    $image_upload_url = $initialise_image_data->uploadUrl;
+                    $image_urn = $initialise_image_data->image;
+                    $image_get = Http::get($image);
+                    if ($image_get->successful()) {
+                        $image_body = (string) $image_get->body();
+                        $image_upload = Http::withBody($image_body, 'application/zip')
+                            ->withToken(LinkedIn::getToken())
+                            ->put($image_upload_url);
+
+                        if (!$image_upload->successful()) {
+                            $image_urn = null;
+                            Log::error('[LinkedIn] Could not successfully upload image: '.$image_upload->body());
+                        }
+                    } else {
+                        Log::error('[LinkedIn] Could not get image data from URL: '.$image);
+                    }
+                } else {
+                    Log::error('[LinkedIn] Received unexpected response to image upload initialisation: '.$initialise_image_data);
                 }
-
-                $content['contentEntities'] = [$contentEntities];
-                $content['title'] = $title;
-                $data['content'] = $content;
             }
 
-            $data['owner'] = $owner;
-            $distribution['linkedInDistributionTarget'] = (object) null;
-            $data['distribution'] = $distribution;
+            // Add link title and description
+            if($url) {
+                $article['source'] = $url;
+                if ($image_urn) { $article['thumbnail'] = $image_urn; }
+                $article['title'] = $title;
+                $article['description'] = $commentary;
+                $data['content'] = ['article' => $article];
+            }
 
-            $response = Http::withToken(LinkedIn::getToken())->post($post_share_url, $data);
+            // Make API call
+            $response = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
+                ->withToken(LinkedIn::getToken())
+                ->post($post_share_url, $data);
 
+            // Check if successful
             if($response->successful()) {
                 return true;
             } else {
@@ -60,8 +89,7 @@ class LinkedIn
                 return false;
             }
         } else {
-            // TODO: Better error catching
-            Log::error('LinkedIn: Cannot post shares without being authorized.');
+            Log::error('[LinkedIn] Cannot post shares without being authorised.');
         }
     }
 }
