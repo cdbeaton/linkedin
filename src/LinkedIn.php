@@ -50,9 +50,8 @@ class LinkedIn
                     $image_get = Http::get($image);
                     if ($image_get->successful()) {
                         $image_body = (string) $image_get->body();
-                        $image_upload = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
-                            ->withBody($image_body)
-                            ->withToken(LinkedIn::getToken())
+                        $image_upload = Http::withToken(LinkedIn::getToken())
+                            ->withBody($image_body, 'application/octet-stream')
                             ->put($image_upload_url);
 
                         if (!$image_upload->successful()) {
@@ -75,6 +74,9 @@ class LinkedIn
                 $article['description'] = $commentary;
                 $data['content'] = ['article' => $article];
             }
+
+            $data['lifecycleState'] = 'PUBLISHED';
+            $data['isReshareDisabledByAuthor'] = 'false';
 
             // Make API call
             $response = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
