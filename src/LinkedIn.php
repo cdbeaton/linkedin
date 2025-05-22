@@ -76,7 +76,7 @@ class LinkedIn
             }
 
             $data['lifecycleState'] = 'PUBLISHED';
-            $data['isReshareDisabledByAuthor'] = 'false';
+            $data['isReshareDisabledByAuthor'] = false;
 
             // Make API call
             $response = Http::withHeaders(['X-Restli-Protocol-Version' => '2.0.0', 'LinkedIn-Version' => '202505'])
