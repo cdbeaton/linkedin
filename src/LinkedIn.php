@@ -60,7 +60,7 @@ class LinkedIn
                         Log::error('[LinkedIn] Could not get image data from URL: '.$image);
                     }
                 } else {
-                    Log::error('[LinkedIn] Received unexpected response to image upload initialisation: '.$initialise_image_data);
+                    Log::error('[LinkedIn] Received unexpected response to image upload initialisation: '.var_dump($initialise_image_data));
                 }
             }
 
