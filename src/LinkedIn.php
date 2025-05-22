@@ -45,8 +45,8 @@ class LinkedIn
                 $initialise_image_data = json_decode($initialise_image_response->getBody());
 
                 if (property_exists($initialise_image_data, 'value')) {
-                    $image_upload_url = $initialise_image_data->uploadUrl;
-                    $image_urn = $initialise_image_data->image;
+                    $image_upload_url = $initialise_image_data->value->uploadUrl;
+                    $image_urn = $initialise_image_data->value->image;
                     $image_get = Http::get($image);
                     if ($image_get->successful()) {
                         $image_body = (string) $image_get->body();
