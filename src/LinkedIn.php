@@ -25,13 +25,20 @@ class LinkedIn
             $post_share_url = 'https://api.linkedin.com/rest/posts';
 
             $data['author'] = $author;
-            if($commentary) { $data['commentary'] = $commentary; }
             $data['visibility'] = 'PUBLIC';
             $data['distribution'] = [
                 'feedDistribution' => 'MAIN_FEED',
                 'targetEntities' => [],
                 'thirdPartyDistributionChannels' => []
             ];
+
+            // Escape any parentheses in commentary
+            if ($commentary) {
+                $commentary = preg_replace_callback('/([\(\)\{\}\[\]])|([@*<>\\\\\_~])/m', function ($matches) {
+                    return '\\'.$matches[0];
+                }, $commentary);
+                $data['commentary'] = $commentary;
+            }
 
             // Upload any thumbnail to LinkedIn using the Images API
             if ($image) {
